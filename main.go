@@ -5,19 +5,17 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"sync"
 )
 
 func naive(limit int) []int {
 	primes := []int{}
-	for i := 0; i <= limit; i++ {
+	for i := 2; i <= limit; i++ {
+		if i == 2 {
+			primes = append(primes, i)
+			continue
+		}
 		n := float64(i)
-		if n == 0 || n == 1 {
-			continue
-		}
-		if n == 2 {
-			primes = append(primes, 2)
-			continue
-		}
 		found := false
 		for i := 2.0; i < n; i++ {
 			if math.Mod(n, i) == 0 {
@@ -29,6 +27,41 @@ func naive(limit int) []int {
 			primes = append(primes, i)
 		}
 	}
+	sort.Ints(primes)
+	return primes
+}
+
+func parallelSieve(limit int) []int {
+	primes := []int{}
+	sieb := map[int]bool{}
+	for i := 2; i <= limit; i++ {
+		sieb[i] = true
+	}
+	var wg sync.WaitGroup
+	mutex := &sync.Mutex{}
+	for i := 2; i <= int(math.Sqrt(float64(limit))); i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			for k, v := range sieb {
+				if k <= i || v == false {
+					continue
+				}
+				if math.Mod(float64(k), float64(i)) == 0 {
+					mutex.Lock()
+					sieb[k] = false
+					mutex.Unlock()
+				}
+			}
+		}(i)
+	}
+	wg.Wait()
+	for k, v := range sieb {
+		if v == true {
+			primes = append(primes, k)
+		}
+	}
+	sort.Ints(primes)
 	return primes
 }
 
@@ -53,6 +86,34 @@ func sieve(limit int) []int {
 			primes = append(primes, k)
 		}
 	}
+	sort.Ints(primes)
+	return primes
+}
+
+func memoize(limit int) []int {
+	primes := []int{}
+	for i := 2; i <= limit; i++ {
+		if i == 2 {
+			primes = append(primes, i)
+			continue
+		}
+		n := float64(i)
+		found := false
+		thres := math.Sqrt(n)
+		for _, i := range primes {
+			if float64(i) > thres {
+				break
+			}
+			if math.Mod(n, float64(i)) == 0 {
+				found = true
+				break
+			}
+		}
+		if !found {
+			primes = append(primes, i)
+		}
+	}
+	sort.Ints(primes)
 	return primes
 }
 
@@ -70,6 +131,10 @@ func main() {
 		primes = naive(limit)
 	case "sieve":
 		primes = sieve(limit)
+	case "parallel_sieve":
+		primes = parallelSieve(limit)
+	case "memoize":
+		primes = memoize(limit)
 	}
 	if verbose {
 		sort.Ints(primes)
