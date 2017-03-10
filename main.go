@@ -9,12 +9,8 @@ import (
 )
 
 func naive(limit int) []int {
-	primes := []int{}
-	for i := 2; i <= limit; i++ {
-		if i == 2 {
-			primes = append(primes, i)
-			continue
-		}
+	primes := []int{2}
+	for i := 3; i <= limit; i++ {
 		n := float64(i)
 		found := false
 		for i := 2.0; i < n; i++ {
@@ -27,7 +23,6 @@ func naive(limit int) []int {
 			primes = append(primes, i)
 		}
 	}
-	sort.Ints(primes)
 	return primes
 }
 
@@ -66,23 +61,24 @@ func parallelSieve(limit int) []int {
 }
 
 func sieve(limit int) []int {
-	primes := []int{}
-	sieb := map[int]bool{}
-	for i := 2; i <= limit; i++ {
-		sieb[i] = true
+	thres := math.Sqrt(float64(limit))
+	sieb := map[int]bool{0: true, 1: true}
+	for i := 2; i<limit;i++{
+		sieb[i] = false
 	}
-	for i := 2; i <= int(math.Sqrt(float64(limit))); i++ {
-		for k, v := range sieb {
-			if k <= i || v == false {
-				continue
+	for i := 0; float64(i) <= thres; i++ {
+		if !sieb[i] {
+			for j:=i*i; j <= limit; j+=i {
+				if !sieb[j] {
+					sieb[j] = true
+				}
 			}
-			if math.Mod(float64(k), float64(i)) == 0 {
-				sieb[k] = false
-			}
+		} else {
 		}
 	}
+	primes := []int{}
 	for k, v := range sieb {
-		if v == true {
+		if !v {
 			primes = append(primes, k)
 		}
 	}
@@ -91,20 +87,16 @@ func sieve(limit int) []int {
 }
 
 func memoize(limit int) []int {
-	primes := []int{}
-	for i := 2; i <= limit; i++ {
-		if i == 2 {
-			primes = append(primes, i)
-			continue
-		}
+	primes := []int{2}
+	for i := 3; i <= limit; i++ {
 		n := float64(i)
 		found := false
 		thres := math.Sqrt(n)
-		for _, i := range primes {
-			if float64(i) > thres {
+		for _, p := range primes {
+			if float64(p) > thres {
 				break
 			}
-			if math.Mod(n, float64(i)) == 0 {
+			if math.Mod(n, float64(p)) == 0 {
 				found = true
 				break
 			}

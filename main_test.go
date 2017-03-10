@@ -8,7 +8,7 @@ func TestPrimes(t *testing.T) {
 	results := map[string][]int{"naive": naive(limit), "sieve": sieve(limit), "parallelSieve": parallelSieve(limit), "memoize": memoize(limit)}
 	for algorithm, primes := range results {
 		if len(primes) != len(expected) {
-			t.Errorf("[%s] Number of primes don't match", algorithm)
+			t.Errorf("[%s] Number of primes don't match %d vs %d", algorithm, len(primes), len(expected))
 		}
 		for i := range primes {
 			if primes[i] != expected[i] {
