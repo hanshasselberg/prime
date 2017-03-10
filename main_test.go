@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"sort"
+)
 
 func TestPrimes(t *testing.T) {
 	limit := 100
@@ -10,6 +13,7 @@ func TestPrimes(t *testing.T) {
 		if len(primes) != len(expected) {
 			t.Errorf("[%s] Number of primes don't match %d vs %d", algorithm, len(primes), len(expected))
 		}
+		sort.Ints(primes)
 		for i := range primes {
 			if primes[i] != expected[i] {
 				t.Errorf("[%s] Primes don't match at %d: %d vs %d", algorithm, i, primes[i], expected[i])

@@ -56,7 +56,6 @@ func parallelSieve(limit int) []int {
 			primes = append(primes, k)
 		}
 	}
-	sort.Ints(primes)
 	return primes
 }
 
@@ -82,7 +81,6 @@ func sieve(limit int) []int {
 			primes = append(primes, k)
 		}
 	}
-	sort.Ints(primes)
 	return primes
 }
 
@@ -105,7 +103,6 @@ func memoize(limit int) []int {
 			primes = append(primes, i)
 		}
 	}
-	sort.Ints(primes)
 	return primes
 }
 
