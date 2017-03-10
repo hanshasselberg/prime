@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"sort"
-	"sync"
 )
 
 func naive(limit int) []int {
@@ -26,39 +25,6 @@ func naive(limit int) []int {
 	return primes
 }
 
-func parallelSieve(limit int) []int {
-	primes := []int{}
-	sieb := map[int]bool{}
-	for i := 2; i <= limit; i++ {
-		sieb[i] = true
-	}
-	var wg sync.WaitGroup
-	mutex := &sync.Mutex{}
-	for i := 2; i <= int(math.Sqrt(float64(limit))); i++ {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
-			for k, v := range sieb {
-				if k <= i || v == false {
-					continue
-				}
-				if math.Mod(float64(k), float64(i)) == 0 {
-					mutex.Lock()
-					sieb[k] = false
-					mutex.Unlock()
-				}
-			}
-		}(i)
-	}
-	wg.Wait()
-	for k, v := range sieb {
-		if v == true {
-			primes = append(primes, k)
-		}
-	}
-	return primes
-}
-
 func sieve(limit int) []int {
 	thres := math.Sqrt(float64(limit))
 	sieb := map[int]bool{0: true, 1: true}
@@ -72,7 +38,6 @@ func sieve(limit int) []int {
 					sieb[j] = true
 				}
 			}
-		} else {
 		}
 	}
 	primes := []int{}
@@ -120,8 +85,6 @@ func main() {
 		primes = naive(limit)
 	case "sieve":
 		primes = sieve(limit)
-	case "parallel_sieve":
-		primes = parallelSieve(limit)
 	case "memoize":
 		primes = memoize(limit)
 	}

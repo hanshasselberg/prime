@@ -15,12 +15,9 @@ func TestPerformance(t *testing.T) {
 	t.Logf("[naive]        limit %6d took %s", limit, time.Since(start))
 	limit = 500000
 	start = time.Now()
-	sieve(limit)
-	t.Logf("[sieve]        limit %6d took %s", limit, time.Since(start))
-	start = time.Now()
-	parallelSieve(limit)
-	t.Logf("[paralleSieve] limit %6d took %s", limit, time.Since(start))
-	start = time.Now()
 	memoize(limit)
 	t.Logf("[memoize]      limit %6d took %s", limit, time.Since(start))
+	start = time.Now()
+	sieve(limit)
+	t.Logf("[sieve]        limit %6d took %s", limit, time.Since(start))
 }
